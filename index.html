@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <!-- يفتح تلقائيًا بوضع سطح المكتب على الهاتف -->
+    <meta name="viewport" content="width=1024">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>اختبار عبدالحليم شحاتة الفقي - 100 سؤال</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#a8edea,#fed6e3);min-height:100vh;display:flex;flex-direction:column}
+        #game{background:white;padding:40px 30px;box-shadow:0 10px 40px rgba(0,0,0,0.15);margin:auto;text-align:center;flex-grow:1;max-width:1100px;border-radius:30px}
+        .main-title{font-size:3.2em;background:linear-gradient(90deg,#e91e63,#9c27b0,#3f51b5,#2196f3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;margin-bottom:10px}
+        .subtitle{font-size:1.9em;color:#2d3436;margin:15px 0;font-weight:bold}
+        .teacher{position:absolute;bottom:15px;left:20px;color:#27ae60;font-weight:bold;font-size:1.1em}
+        #timer{position:fixed;top:15px;right:15px;right:15px;background:#c0392b;color:white;padding:10px 22px;border-radius:35px;font-size:1.6em;z-index:9999;box-shadow:0 5px 20px rgba(0,0,0,0.4)}
+        #question{font-size:2.1em;line-height:2.4;background:#f0f8ff;padding:45px;border-radius:30px;margin:30px 0;color:#2d3436;font-weight:bold;box-shadow:inset 0 8px 20px rgba(0,0,0,0.1)}
+        #options{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:25px;margin:50px 0}
+        button{background:#dfe6e9;color:#2d3436;border:none;padding:32px;border-radius:25px;font-size:1.9em;font-weight:bold;cursor:pointer;transition:all .4s;box-shadow:0 15px 30px rgba(0,0,0,0.25)}
+        button:hover:not(:disabled){background:#b2bec3;transform:translateY(-8px)}
+        button.correct-answer{background:#00b894 !important;color:white;animation:pulse 0.8s}
+        button.wrong-answer{background:#d63031 !important;color:white}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+        #feedback{font-size:2.5em;font-weight:bold;margin:50px 0;min-height:110px}
+        .correct{color:#00b894}.wrong{color:#d63031}
+        #bottomBar{position:fixed;bottom:0;left:0;width:100%;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:10px 20px;box-shadow:0 -8px 25px rgba(0,0,0,0.3);z-index:9999;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;font-size:1.2em;font-weight:bold}
+        #navBtnsInBar{display:flex;gap:12px}
+        #navBtnsInBar button{background:white;color:#764ba2;padding:8px 25px;border-radius:50px;font-size:1.2em;font-weight:bold;box-shadow:0 5px 12px rgba(0,0,0,0.3)}
+        #navBtnsInBar button:hover{background:#f0f0f0;transform:translateY(-2px)}
+        #statsInBar{display:flex;gap:15px;align-items:center;flex-wrap:wrap;justify-content:center}
+        .stat-item{background:rgba(255,255,255,0.25);padding:6px 14px;border-radius:18px;font-size:0.9em}
+        #currentQuestionDisplay{background:rgba(0,0,0,0.5);padding:6px 14px;border-radius:18px;color:#ffeb3b;font-size:0.95em}
+        #end{display:none;margin-top:100px}
+        #restart{background:#00b894;color:white;padding:25px 90px;border-radius:35px;font-size:2.2em;cursor:pointer;margin:40px}
+        #certificate{margin-top:60px;padding:70px;border:20px double #00b894;background:linear-gradient(145deg,#e6fffa,#ccfbf1);border-radius:60px;display:none}
+        .stars{font-size:6.5em;color:#fdcb6e}
+    </style>
+</head>
+<body>
+
+<div id="timer">30</div>
+
+<div id="game">
+    <h1 class="main-title">اختبار عبدالحليم شحاتة الفقي</h1>
+    <div class="subtitle">الهمزة المتطرفة فى أخر الكلمة    </div>
+    <div class="teacher">إعداد المعلم: أحمد شوق خليفة</div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="feedback"></div>
+</div>
+
+<div id="bottomBar">
+    <div id="navBtnsInBar">
+        <button id="backBtn" onclick="goBack()">السابق</button>
+        <button id="nextBtn" onclick="goNext()">التالي</button>
+    </div>
+    <div id="statsInBar">
+        <div id="currentQuestionDisplay">السؤال 1 من 100</div>
+        <div class="stat-item">الصحيح <div id="liveCorrect">0</div></div>
+        <div class="stat-item">الخطأ <div id="liveWrong">0</div></div>
+        <div class="stat-item">الدرجة <div id="liveScore">0 / 100</div></div>
+        <div class="stat-item">النسبة <div id="livePercent">0%</div></div>
+    </div>
+</div>
+
+<div id="end">
+    <h2 style="color:#00695c;font-size:3.8em;margin:60px 0;">انتهى الاختبار يا بطل!</h2>
+    <div id="final-score"></div>
+    <div id="certificate">
+        <div class="stars">★★★★★★</div>
+        <h2>شهادة تفوق في النحو</h2>
+        <p>بكل فخر تُمنح هذه الشهادة للطالب المتميز<br>
+        <strong style="font-size:2.5em;color:#00b894;">عبدالحليم شحاتة الفقي</strong><br>
+        لإتقانه الهمزة المتطرفة فى أخر الكلمة بدرجة كاملة 100/100</p>
+        <p>بتاريخ: <span id="date"></span></p>
+        <div class="stars">★★★★★</div>
+    </div>
+    <button id="restart" onclick="location.reload()">إعادة الاختبار</button>
+</div>
+
+<audio id="correctSound" preload="auto"><source src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
+<audio id="wrongSound" preload="auto"><source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-alert-932.mp3"></audio>
+<audio id="winSound" preload="auto"><source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-completion-997.mp3"></audio>
+
+<script>
+const questions = [
+    // دورة 1
+    {q:"الكلمة: جَزْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: قرأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الضمة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: بُطْؤ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: شَاطئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: شَيْأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: بُدأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الضمة قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: يَجْرُؤُ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: لَاجئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: بَطْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: ملأَ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+
+    // دورة 2
+    {q:"الكلمة: أَمْرُء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: يَربؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: هُدْوْءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: نُبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: جُؤْجُأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: بُؤْبُؤٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: دَفْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: سِبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَجْزُؤُ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: بِدُؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+
+    // دورة 3
+    {q:"الكلمة: نَشْءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: مَنْشأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَنْبُؤٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: أَبْطؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: مَلْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مُبْتَدأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَقْيُؤٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: أَنْشئَ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: بَرِيْ ءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: طِرأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+
+    // دورة 4
+    {q:"الكلمة: تَجْشُأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: تَقْيُؤٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: جَرِيأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: دُرأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَبْرُء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: أَهْدؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الضمة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: سَمَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: قِرأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الضمة قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَكَافُأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: أَطْفؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+
+    // دورة 5
+    {q:"الكلمة: صَحْرَاؤ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: ذرأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَوَاطُؤٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: يُطْفئُ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الفتحة قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: رَوَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: رُبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: تَبُوْؤُ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: يُنَاوئُ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: دُعَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: شِفأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+
+    // دورة 6
+    {q:"الكلمة: تَهْيُؤٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: يَخْتَبئُ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: شِفَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: عبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: بُؤْبُؤٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: هَزؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: بَدْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: جُزأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: سمراء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: يَبْدئُ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+
+    // دورة 7
+    {q:"الكلمة: خَبْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: فِثأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: منشَئ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مُتَكؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: عِبْء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: كافأَ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: منشُأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مُتَهَيّئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: مَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: اِخْتَبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+
+    // دورة 8
+    {q:"الكلمة: قرَاؤ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مُسْتَهْزئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الفتحة قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: عَلَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: أَرْجأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: كَافَأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: مُخْتَبؤ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب الضمة قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: ضَوْأٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: شَقأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: قَرَء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مُتَنَاهئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الفتحة قبلها"], correct:"بسبب الكسرة قبلها"},
+
+    // دورة 9
+    {q:"الكلمة: نَشْأَ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: قُضأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: مجتزَأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: مُفَاجئٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: لُمْيَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: مُلأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: توضَأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: لُؤْلؤٌ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الضمة قبلها","بسبب السكون قبلها"], correct:"بسبب الضمة قبلها"},
+    {q:"الكلمة: سَوَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: بُدأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+
+    // دورة 10
+    {q:"الكلمة: قرُأ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: مَرَافئُ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب السكون قبلها","بسبب الفتحة قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: جَوَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: نُبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب الكسرة قبلها","بسبب السكون قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: شيماء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: مُبتَدئ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"},
+    {q:"الكلمة: فِدَاءٌ", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"صح"},
+    {q:"الكلمة: سِبأ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الفتحة قبلها","بسبب السكون قبلها","بسبب الكسرة قبلها"], correct:"بسبب الفتحة قبلها"},
+    {q:"الكلمة: ينشُىء", question:"هل كتابة الهمزة في الكلمة صحيحة؟", options:["صح","خطأ"], correct:"خطأ"},
+    {q:"الكلمة: هُدئَ", question:"لماذا كُتبت الهمزة بهذا الشكل؟", options:["بسبب الكسرة قبلها","بسبب الفتحة قبلها","بسبب السكون قبلها"], correct:"بسبب الكسرة قبلها"}
+];
+let currentQuestionIndex = 0, score = 0, correctCount = 0, wrongCount = 0, answered = new Array(100).fill(false), userAnswers = new Array(100).fill(null), timerInterval, timeLeft = 60;
+
+function init() {
+    currentQuestionIndex = 0; score = 0; correctCount = 0; wrongCount = 0;
+    answered.fill(false); userAnswers.fill(null);
+    document.getElementById('end').style.display = 'none';
+    document.getElementById('question').style.display = 'block';
+    document.getElementById('options').style.display = 'grid';
+    document.getElementById('feedback').textContent = '';
+    updateAllStats();
+    showQuestion();
+    startTimer();
+}
+
+function updateAllStats() {
+    const percent = Math.round((score / 100) * 100);
+    document.getElementById('liveCorrect').textContent = correctCount;
+    document.getElementById('liveWrong').textContent = wrongCount;
+    document.getElementById('liveScore').textContent = `${score} / 100`;
+    document.getElementById('livePercent').textContent = `${percent}%`;
+    document.getElementById('currentQuestionDisplay').textContent = `السؤال ${currentQuestionIndex + 1} من 100`;
+}
+
+function startTimer() {
+    timeLeft = 60;
+    document.getElementById('timer').textContent = timeLeft;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            if (!answered[currentQuestionIndex]) {
+                document.getElementById('feedback').innerHTML = 'انتهى الوقت!';
+                document.getElementById('feedback').className = 'wrong';
+                document.getElementById('wrongSound').play();
+                wrongCount++;
+                answered[currentQuestionIndex] = true;
+                updateAllStats();
+            }
+            setTimeout(goToNextQuestion, 1500);
+        }
+    }, 1000);
+}
+
+function showQuestion() {
+    const q = questions[currentQuestionIndex];
+    document.getElementById('question').innerHTML = `<div style="font-size:2em;color:#d35400;margin-bottom:25px;">${q.q}</div><div>${q.question}</div>`;
+    const div = document.getElementById('options');
+    div.innerHTML = '';
+    if (!answered[currentQuestionIndex]) {
+        let opts = [...q.options];
+        shuffle(opts);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.textContent = opt;
+            btn.onclick = () => selectAnswer(opt);
+            div.appendChild(btn);
+        });
+    } else {
+        div.innerHTML = `<div style="font-size:2.2em;color:#00b894;padding:35px;background:#e8f5e9;border-radius:25px;">تمت الإجابة: <strong>${userAnswers[currentQuestionIndex]}</strong></div>`;
+    }
+    document.getElementById('feedback').textContent = '';
+    updateAllStats();
+}
+
+function selectAnswer(selected) {
+    if (answered[currentQuestionIndex]) return;
+    clearInterval(timerInterval);
+    answered[currentQuestionIndex] = true;
+    userAnswers[currentQuestionIndex] = selected;
+
+    const correct = questions[currentQuestionIndex].correct;
+    document.querySelectorAll('#options button').forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) btn.classList.add('correct-answer');
+        if (btn.textContent === selected && selected !== correct) btn.classList.add('wrong-answer');
+    });
+
+    if (selected === correct) {
+        document.getElementById('feedback').innerHTML = 'ممتاز يا عبدالحليم ! الإجابة صحيحة   !';
+        document.getElementById('feedback').className = 'correct';
+        document.getElementById('correctSound').play();
+        score++; correctCount++;
+    } else {
+        document.getElementById('feedback').innerHTML = `  الإجابة خاطئة  ياعبدو , الصح  : <strong>${correct}</strong>`;
+        document.getElementById('feedback').className = 'wrong';
+        document.getElementById('wrongSound').play();
+        wrongCount++;
+    }
+    updateAllStats();
+    setTimeout(goToNextQuestion, 1500);
+}
+
+function goToNextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < 100) {
+        showQuestion();
+        startTimer();
+    } else {
+        endGame();
+    }
+}
+
+function goBack() { if(currentQuestionIndex > 0) currentQuestionIndex--, showQuestion(), startTimer() }
+function goNext() { goToNextQuestion(); }
+
+function endGame() {
+    clearInterval(timerInterval);
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('end').style.display = 'block';
+    const percent = Math.round((score / 100) * 100);
+    document.getElementById('final-score').innerHTML = `<h2 style="color:#00695c;">نتيجتك: ${score}/100 (${percent}%)</h2>`;
+
+    if (percent >= 90) {
+        document.getElementById('certificate').style.display = 'block';
+        document.getElementById('date').textContent = new Date().toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'});
+        document.getElementById('winSound').play();
+    }
+
+    // رسالة مفصلة تحتوي على الأخطاء فقط + الإحصائيات
+    let message = `نتيجة عبدالحليم شحاتة الفقي\n`;
+    message += `الدرجة: ${score}/100 (${percent}%)\n`;
+    message += `الصحيح: ${correctCount} | الخطأ: ${wrongCount}\n`;
+    message += `التاريخ: ${new Date().toLocaleString('ar-EG')}\n\n`;
+
+    if (wrongCount === 0) {
+        message += `مبرووووووووك يا عبدالحليم!\nأداء مثالي 100% لا يوجد أي خطأ`;
+    } else {
+        message += `الأخطاء التي وقعت فيها   (${wrongCount} أخطاء فقط):\n\n`;
+        questions.forEach((q, i) => {
+            if ((userAnswers[i] && userAnswers[i] !== q.correct) || (!userAnswers[i])) {
+                const userAns = userAnswers[i] || "لم يُجب";
+                message += `${i+1}. ${q.q}\n   السؤال: ${q.question}\n   إجابتك: ${userAns}\n   الصحيح: ${q.correct}\n\n`;
+            }
+        });
+        message += `. قم باعادة الاختبار حتى تحقق النتيجة النهائية - عبدالحليم بطل وهيعدي كل ده في المرة الجاية إن شاء الله!`;
+    }
+
+    const encoded = encodeURIComponent(message.trim());
+    window.location.href = `whatsapp://send?phone=201062077664&text=${encoded}`;
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
